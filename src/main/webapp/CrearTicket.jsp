@@ -63,9 +63,10 @@
 </style>
 </head>
 <body>
+
 <div class="container">
   <h1>Registro de Tickets</h1>
-  <form action="CrearTicket" method="get">
+  <form action="NuevoTicket" method="get">
 
     <label for="id_colegiado">ID del Colegiado:</label>
     <input type="number" name="id_colegiado" id="id_colegiado" placeholder="Ingrese el ID del colegiado" >
@@ -121,8 +122,9 @@ if(objColegiado instanceof List){
 	<label>Comentario</label>
 	<textarea rows=10"" cols="53" placeholder="Ingrese su gestion" name="comentario" required="required"></textarea>
 
-    <button type="submit" name="generar">Registrar Ticket</button>
+    <button type="submit" name="generar" id="generar">Registrar Ticket</button>
   </form>
+  <div> Su ticket es: ${ticket}</div>
 </div>
 </body>
 </html>

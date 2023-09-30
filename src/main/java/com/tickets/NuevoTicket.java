@@ -13,15 +13,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class CrearTicket
+ * Servlet implementation class NuevoTicket
  */
-@WebServlet("/CrearTicket")
-public class CrearTicket extends HttpServlet {
+@WebServlet("/NuevoTicket")
+public class NuevoTicket extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		if(request.getParameter("validar") != null ) {
@@ -57,8 +54,15 @@ public class CrearTicket extends HttpServlet {
 			Lista.add(request.getParameter("numero_colegiado"));
 			Lista.add(request.getParameter("area"));
 			
-			for (String string : Lista) {
-				System.out.println(string);
+			try {
+				Connmysql conn = new Connmysql();
+				int numeo = conn.GeneraTicket(Lista);
+				System.out.println("Se genero el numero " + numeo);
+				conn.cerrarConexion();
+				request.setAttribute("ticket", numeo);
+			}catch(Exception e) {
+				e.printStackTrace();
+				System.out.println("NO se genero el numero");
 			}
 		}
 		
@@ -77,3 +81,5 @@ public class CrearTicket extends HttpServlet {
 	}
 
 }
+
+

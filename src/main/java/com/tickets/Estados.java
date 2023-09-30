@@ -1,6 +1,7 @@
 package com.tickets;
 
 import java.io.IOException;
+import java.sql.ResultSet;
 
 import com.mysql.Connmysql;
 
@@ -51,12 +52,23 @@ public class Estados extends HttpServlet {
 			 if ("Atender".equals(accion)) {
 				System.out.println("Atendiendo");
 				conn.Atentiendo(Integer.parseInt(id_ticket), Integer.parseInt(usuario));
-				response.getWriter().append("Servidor: ").append("Accion Procesada");
+				
+				ResultSet rsComentario = conn.comentario(Integer.parseInt(id_ticket));
+				String stComentario = null;
+				while(rsComentario.next()) {
+				 stComentario = rsComentario.getString("comentario_usario");
+				}
+				System.out.println("El comentario es:" + stComentario);
+				request.setAttribute("comentario_colegiado", stComentario);
+				conn.cerrarConexion();
+				response.getWriter().append("El colegiado indica: ").append( stComentario);
 			}else if("Finalizar".equals(accion)) {
 				System.out.println("Se finaliza");
 				conn.FinalizaTicket(Integer.parseInt(id_ticket), comentario, Integer.parseInt(usuario));
 				conn.cerrarConexion();
 				response.sendRedirect("AtencionTicket.jsp");
+			}else if("Traslado".equals(accion)) {
+				System.out.println("Se traslada Ticket");
 			}else {
 				System.out.println("No se ha recibido ninguna accion");
 			}

@@ -192,55 +192,64 @@ public class Connmysql {
 			return false;
 		}
 	}
-
+//Cambia el estado de ticker a llamada
 	public void llama_ticket(int ticket) throws SQLException {
 		CallableStatement sc = conexion.prepareCall(" { call llamar_ticket (?) }");
 		sc.setInt(1, ticket);
 		sc.execute();
 	}
 
+	//Retornal el ticket a la cola
 	public void Retorna_ticket(int ticket) throws SQLException {
 		CallableStatement cl = conexion.prepareCall(" { call Retorna_Ticket (?) } ");
 		cl.setInt(1, ticket);
 		cl.execute();
 	}
 
-	
-	public void Atentiendo(int ticket, int usuario) throws SQLException{
+	//Actualiza el estado de ticket a atendiendo 
+	public void Atentiendo(int ticket, int usuario) throws SQLException {
 		CallableStatement cl = conexion.prepareCall(" { call Atendiendo_ticket (?, ? ) } ");
 		cl.setInt(1, ticket);
 		cl.setInt(2, usuario);
 		cl.execute();
 	}
-	
-	public void FinalizaTicket (int ticket, String comentario, int usuario) throws SQLException {
+
+	//Finaliza el proceso del ticket
+	public void FinalizaTicket(int ticket, String comentario, int usuario) throws SQLException {
 		CallableStatement cl = conexion.prepareCall(" { call Finalizar (?, ?, ?) } ");
 		cl.setInt(1, ticket);
 		cl.setString(2, comentario);
 		cl.setInt(3, usuario);
 		cl.execute();
 	}
+
+	//Genera un nuevo ticket
+	public int GeneraTicket(ArrayList<String> ticket) throws SQLException {
+		int numero = 0;
+		CallableStatement cl = conexion.prepareCall(" {call RegistraTicket (?, ?, ?) } ");
+		cl.setString(1, ticket.get(0));
+		cl.setInt(2, Integer.parseInt(ticket.get(1)));
+		cl.setInt(3, Integer.parseInt(ticket.get(2)));
+		cl.execute();
+
+		String consulta = "SELECT id_ticket\r\n" + "FROM ticket t\r\n" + "WHERE id_colegiado = ?\r\n"
+				+ "  AND estado_ticket = 1\r\n" + "ORDER BY id_ticket DESC\r\n" + "LIMIT 1;";
+		PreparedStatement ps = conexion.prepareStatement(consulta);
+		ps.setInt(1, Integer.parseInt(ticket.get(1)));
+		ResultSet rs_numero = ps.executeQuery();
+		while (rs_numero.next()) {
+			numero = Integer.parseInt(rs_numero.getString("id_ticket"));
+		}
+		System.out.println("Creacion de ticket");
+		return numero;
+	}
 	
-	
-	
-	
-	
-	public void RegistraDatos(ArrayList<String> datos) throws SQLException {
-		String insert = "insert into tarea (nombre, apellido, correo, telefono, edad, ciudad, pais, comentario, genero, interes)\r\n"
-				+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ";
-		PreparedStatement ps = conexion.prepareStatement(insert);
-		ps.setString(1, datos.get(0)); // nombre
-		ps.setString(2, datos.get(1)); // apellido
-		ps.setString(3, datos.get(2)); // correo
-		ps.setInt(4, Integer.parseInt(datos.get(3))); // telefono
-		ps.setInt(5, Integer.parseInt(datos.get(4))); // edad
-		ps.setString(6, datos.get(5)); // ciudad
-		ps.setString(7, datos.get(6)); // pais
-		ps.setString(8, datos.get(7));
-		ps.setString(9, datos.get(8));
-		ps.setString(10, datos.get(9));
-		ps.execute();
-		ps.close();
+	//Obitiene el comentario sobre la solicitud del ticket
+	public ResultSet comentario(int ticket ) throws SQLException{
+		String consulta = "SELECT comentario_usario from ticket t where id_ticket = ?;";
+		PreparedStatement ps = conexion.prepareStatement(consulta);
+		ps.setInt(1, ticket);
+		return ps.executeQuery();
 	}
 
 }

@@ -69,7 +69,7 @@
     <% if (sssion != null) { %>
         <% usuario = (String) sssion.getAttribute("pagina"); %>
     <% } %>
-
+ 
     <%-- Utilizar el valor en la página JSP --%>
     <p>Usuario en Sesion: <%= usuario %></p>
 
