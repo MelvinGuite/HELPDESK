@@ -1,15 +1,13 @@
  <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="java.util.List"%>
-<%@ page import="jakarta.servlet.http.HttpSession" %>
+
 
 <!DOCTYPE html>
 <html lang="es" dir="ltr">
 <head>
     <meta charset="utf-8">
     <title>Asignación de Ticket</title>
-    <style>
-        body {
+<style>
+body {
             font-family: Arial, sans-serif;
             background-color: #f0f8f7; /* Verde suave pastel */
             margin: 0;
@@ -52,129 +50,143 @@
         input[type="text"] {
             padding: 5px;
         }
-    </style>
+        
+
+  </style>
     
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+
 
 </head>
+    <%
+String usuario = (String) request.getSession().getAttribute("sesion");
+if (usuario == null) {
+	
+	%>
+	<script type="text/javascript">
+	    window.close();
+	</script>
+	<%
+	}
+	%>
 <body>
 
-    <div id="contenedor_ticket">
-<form action="CerrarSesion" method="get">
-
-<button type="submit" name="cerrar">Cerrar sesion</button>
-</form>
-    <%-- Recuperar el valor de "pagina" de la sesión --%>
-    <% HttpSession sssion = request.getSession(false); // Obtener la sesión sin crear una nueva %>
-    <% String usuario = null; %>
-    <% if (sssion != null) { %>
-        <% usuario = (String) sssion.getAttribute("pagina"); %>
-    <% } %>
- 
-    <%-- Utilizar el valor en la página JSP --%>
-    <p>Usuario en Sesion: <%= usuario %></p>
-
-<h1>Toma de Ticket</h1>
-
-<script>
-function actualizarTicket() {
-    var xhttp = new XMLHttpRequest();
-    var identificacion = "<%=usuario %>";
-    xhttp.onreadystatechange = function() {
-        if (this.readyState === 4 && this.status === 200) {
-            
-            document.getElementById("contenedor_ticket").innerHTML = this.responseText;
-        }
-    };
-    xhttp.open("GET", "AtencionTicket?identificacion=" + identificacion, true);
-    xhttp.send();
-}
-setInterval(actualizarTicket, 5000);
-  window.onload = actualizarTicket;
-</script>
 
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var formulario = document.getElementById("miFormulario");
-    
-    formulario.addEventListener("submit", function(event) {
-        event.preventDefault(); // Evita el envío normal del formulario
+  <h1>Toma de Ticket</h1>
+    <table id="ticket" >
+        <thead>
+            <tr>
+                <th>No. De Ticket</th>
+                <th>Estado</th>
+                <th>Detalles</th>
+                <th>Accion</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí se insertarán las filas de datos -->
+        </tbody>
+    </table>
 
-        // Crea una instancia de XMLHttpRequest
-        var xhr = new XMLHttpRequest();
 
-        // Configura la solicitud
-        xhr.open("POST", formulario.getAttribute("action"), true);
 
-        // Configura la función de respuesta
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                // Aquí puedes manejar la respuesta del servidor si es necesario
-                console.log(xhr.responseText);
+
+
+
+
+<script type="text/javascript">
+$(document).ready(function () {
+    var identificacion = "<%=usuario%>";
+    var llamadaActual = false; // Variable para rastrear el estado de la llamada actual del usuario
+
+    // Llama a la función cada 3 segundos
+    setInterval(function () {
+        cargarTickets();
+    }, 1000);
+
+    function cargarTickets() {
+        $.ajax({
+            url: 'AtencionTicket',
+            type: 'get',
+            dataType: 'json',
+            data: { identificacion: identificacion },
+            success: function (data) {
+                var tabla = $('#ticket').find('tbody');
+                tabla.empty();
+
+                for (var i = 0; i < data.length; i += 2) {
+                    var id_ticket = data[i];
+                    var estado = data[i + 1];
+
+                    var row = $('<tr>');
+                    row.append($('<td>').text(id_ticket));
+                    row.append($('<td>').text(estado));
+                    row.append($('<td>').html('<a href="DetalleTicket.jsp?id=' + id_ticket + '">Ver Detalles</a>'));
+
+                    var acciones = $('<td>');
+                    var llamarButton = $('<button>').text('Llamar');
+                    var devolverButton = $('<button>').text('Devolver');
+
+                    if (llamadaActual || estado === 'Llamada') {
+                        // Deshabilita el botón de "Llamar" si ya hay una llamada en curso
+                        llamarButton.prop('disabled', true);
+                    }
+
+                    llamarButton.click(function (id, accion) {
+                        return function () {
+                            realizarAccion(accion, id);
+                            // Deshabilita el botón después de hacer clic y marca la llamada actual
+                            llamadaActual = true;
+                            llamarButton.prop('disabled', true);
+                        };
+                    }(id_ticket, 'llamar'));
+
+                    devolverButton.click(function (id, accion) {
+                        return function () {
+                            realizarAccion(accion, id);
+                            // Habilita el botón "Llamar" al devolver la llamada
+                            llamadaActual = false;
+                            llamarButton.prop('disabled', false);
+                        };
+                    }(id_ticket, 'devolver'));
+
+                    acciones.append(llamarButton);
+                    acciones.append(devolverButton);
+
+                    row.append(acciones);
+                    tabla.append(row);
+                }
+            },
+            error: function () {
+                console.log('Error en la solicitud');
             }
-        };
+        });
+    }
 
-
-        var formData = new FormData(formulario);
-
-        // Envía la solicitud
-        xhr.send(formData);
-    });
+    function realizarAccion(accion, id_ticket) {
+        console.log(accion);
+        $.ajax({
+            url: 'Estados',
+            type: 'post',
+            data: {
+                acciones: accion,
+                ticket: id_ticket
+            },
+            success: function (response) {
+                // Procesa la respuesta del servidor si es necesario
+            },
+            error: function () {
+                console.log('Error en la solicitud al servlet');
+            }
+        });
+    }
 });
 </script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <form id="miFormulario" method="post" action="Estados">
-<table>
-    <caption>Tickets en Cola</caption>
-    <tr>
-        <th>No. De Ticket</th>
-        <th>Llamar Ticket</th>
-        <th colspan="1">Acciones</th>
-        <th>Estado</th>
-    </tr>
-
-    <%
-        Object objTicket = request.getAttribute("lsTicket");
-        List<String> lsTicket = null;
-        if (objTicket instanceof List) {
-            lsTicket = (List<String>) objTicket;
-        
-        if (lsTicket != null) {
-            for (int i = 0; i < lsTicket.size(); i += 6) {
-                String id = lsTicket.get(i);
-                String nombre = lsTicket.get(i + 1);
-                String dpi = lsTicket.get(i + 2);
-                String empleado_nombre = lsTicket.get(i + 3);
-                String empleado_apellido = lsTicket.get(i + 4);
-                String estado = lsTicket.get(i + 5);
-    %>
-
- 
-    <tr>
-        <td><input value="<%= id %>" name="ticket" ></td>
-        
-        <td><a href="DetalleTicket.jsp?id=<%=id%>&usuario=<%=usuario%>" target="_blank">Ir a detalles</a></td>
-        
-        <td>Estado Actual: <%=estado%></td>
-<td>
-<button id="llamar" name="llamar" type="submit" value="<%= id %>" >Llamar Ticket</button>
-</td>
-
-<td>
-<button id="devolver" name="devolver" type="submit" value="<%= id %>" >Devolver a cola</button>
-</td>
-    </tr>
-    <%
-            }
-        }
-        }
-    %>
-</table>
-</form>
-
-</div>
 
 </body>
 </html>

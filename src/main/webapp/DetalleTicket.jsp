@@ -52,25 +52,33 @@ select {
 }
 </style>
 </head>
-<%
+    <%
+String usuario = (String) request.getSession().getAttribute("sesion");
+if (usuario == null) {
+	
+	%>
+	<script type="text/javascript">
+	    window.close();
+	</script>
+	<%
+	}
+
+	%>
+	
+	<%
 String identificador = request.getParameter("id");
-%>
-<%
-String identificacion = request.getParameter("usuario");
 %>
 <body>
 	<h1>Detalle y solución de Ticket</h1>
 	<h2>
 		Ticket No:
 		<%=identificador%></h2>
-	<h2>
-		Usuario:
-		<%=identificacion%></h2>
 
+<a href="AtencionTicket.jsp">Regresar</a>
 	<form id="frm_atender">
 		<input name="ticket" id="ticket" value="<%=identificador%>"
 			hidden="true"> <input name="usuario" id="usuario"
-			value="<%=identificacion%>" hidden="true">
+			value="<%=usuario%>" hidden="true">
 		<button name="acciones" value="Atender" id="acciones" type="button"
 			onclick="enviarFormulario()">Atender Ticket</button>
 		<!-- Cambio el id y name -->
@@ -102,7 +110,7 @@ String identificacion = request.getParameter("usuario");
 	<form action="Estados" method="get">
 		<input name="ticket" id="ticket" value="<%=identificador%>"
 			hidden="true"> <input name="usuario" id="usuario"
-			value="<%=identificacion%>" hidden="true"> 
+			value="<%=usuario%>" hidden="true"> 
 
 		<label>Ingrese su comentario</label>
 		<textarea rows="5" cols="15" name="comentario"></textarea>

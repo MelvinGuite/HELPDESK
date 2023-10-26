@@ -7,6 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Registro de Empleados - Colegio de Ingenieros Agrónomos</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -68,7 +70,7 @@
 </style>
 </head>
 <body>
-<h2>${mensaje}</h2> <br>
+
 <div class="container">
   <h1>Registro de Empleados</h1>
   <form action="RegistraEmpleado" method="get">
@@ -83,6 +85,15 @@
 
     <label for="apellido">Apellido:</label>
     <input type="text" name="apellido" id="apellido" placeholder="Ingrese el apellido" required>
+    
+    
+    <label for="Correo">Correo:</label>
+    <input type="email" name="correo" id="correo" placeholder="usuario@example.com" required>
+    
+    
+    <label for="apellido">PASSWORD:</label>
+    <input type="password" name="pass" id="pass" required>
+
 
     <label for="id_rol">Seleccione un Rol:</label>
 
@@ -122,12 +133,14 @@
       if (areas != null) {
   %>
   <select name="id_area" required="required"> 
-    <!-- El ciclo obtiene datos en paquetes de 2-->
+     <option value="0">Rol administrador no requiere area</option> 
+   
     <%
       for(int i = 0; i < areas.size(); i += 2) {
         String id = areas.get(i);
         String nombre = areas.get(i + 1);
     %>
+    
     <option value="<%=id %>"><%=nombre%></option>
 
     <%
@@ -141,7 +154,10 @@
 
     <button type="submit" name="registrar" id="registrar">Registrar Empleado</button>
   </form>
+  <p>${mensaje}</p>
 </div>
+
+
 
 </body>
 </html>

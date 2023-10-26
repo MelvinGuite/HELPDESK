@@ -2,7 +2,9 @@ package com.acceso;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
+import com.google.gson.Gson;
 import com.mysql.Connmysql;
 
 import jakarta.servlet.ServletException;
@@ -22,32 +24,26 @@ public class Login extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	        throws ServletException, IOException {
 	    String correo = request.getParameter("email");
-	    String dpi = request.getParameter("user");
-	    String pagina = "index.jsp";
-
+	    String pass = request.getParameter("user");
+	    String identificacion = null;	    
 	    try {
 	        Connmysql conn = new Connmysql();
-
-	        if (conn.Comprueba(Integer.parseInt(dpi), correo)) {
-	            ResultSet rsDato = conn.login(Integer.parseInt(dpi), correo);
-	            while (rsDato.next()) {
-	                pagina = rsDato.getString("pagina");
-	            }
-
-	            // Obtener la sesión actual o crear una nueva si no existe
-	            HttpSession session = request.getSession(true);
-
-	            // Establecer una variable de sesión con la página
-	            session.setAttribute("pagina", dpi);
-
-	            response.sendRedirect(pagina);
+	        ResultSet rsIdentificacion = conn.Identificacion(correo, pass);
+	        if (rsIdentificacion.next()) {
+	        	identificacion = rsIdentificacion.getString("dpi_empleado");
+				request.getSession().setAttribute("sesion",identificacion);
+				response.sendRedirect("Menu.jsp");
 	        } else {
-	            response.sendRedirect("index.jsp");
+	        	System.out.println("Error inicio");
+	        	request.setAttribute("error", "Datos incorrectos");
+	        	response.sendRedirect("index.jsp");
 	        }
+	        conn.cerrarConexion();
+
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
-	    response.getWriter().append("Served at: ").append(request.getContextPath());
+    	request.getRequestDispatcher("index.jsp").forward(request, response);
 	}
 
 

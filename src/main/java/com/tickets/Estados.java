@@ -11,80 +11,73 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 /**
  * Servlet implementation class Estados
  */
 @WebServlet("/Estados")
 public class Estados extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-  
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String accion = request.getParameter("acciones");
-		String id_ticket = request.getParameter("ticket");
+	    String id_ticket = request.getParameter("ticket");
 		String usuario = request.getParameter("usuario");
 		String comentario = request.getParameter("comentario");
-		String bt_llamar = request.getParameter("llamar");
-		String bt_devolver = request.getParameter("devolver");
-		
-		System.out.println("Boton llamar al ticket " + bt_llamar);
-		System.out.println("Se devuelve a lista el ticket " + bt_devolver);
+
+        System.out.println("Acción: " + accion);
+        System.out.println("ID del ticket: " + id_ticket);
 		try {
 			Connmysql conn = new Connmysql();
-			
-			if(request.getParameter("llamar") != null ) {
-				System.out.println("LLamada de ticket " + bt_llamar);
-				conn.llama_ticket(Integer.parseInt(bt_llamar));
-				response.sendRedirect("AtencionTicket.jsp");
+
+			if("llamar".equals(accion)){
+				System.out.println("LLamada de ticket " + id_ticket);
+				conn.llama_ticket(Integer.parseInt(id_ticket));
 				conn.cerrarConexion();
 			}
 			
-			if(request.getParameter("devolver") != null ) {
-				System.out.println("Devolver a cola " + bt_devolver);
-				conn.Retorna_ticket(Integer.parseInt(bt_devolver));
-				response.sendRedirect("AtencionTicket.jsp");
+			if("devolver".equals(accion)){
+				System.out.println("Devolver a cola " + id_ticket);
+				conn.Retorna_ticket(Integer.parseInt(id_ticket));
 				conn.cerrarConexion();
 			}
 				
-			
-
-			 if ("Atender".equals(accion)) {
+			if ("Atender".equals(accion)) {
 				System.out.println("Atendiendo");
 				conn.Atentiendo(Integer.parseInt(id_ticket), Integer.parseInt(usuario));
-				
+
 				ResultSet rsComentario = conn.comentario(Integer.parseInt(id_ticket));
 				String stComentario = null;
-				while(rsComentario.next()) {
-				 stComentario = rsComentario.getString("comentario_usario");
+				while (rsComentario.next()) {
+					stComentario = rsComentario.getString("comentario_usario");
 				}
 				System.out.println("El comentario es:" + stComentario);
 				request.setAttribute("comentario_colegiado", stComentario);
 				conn.cerrarConexion();
-				response.getWriter().append("El colegiado indica: ").append( stComentario);
-			}else if("Finalizar".equals(accion)) {
+				response.getWriter().append("El colegiado indica: ").append(stComentario);
+			} else if ("Finalizar".equals(accion)) {
 				System.out.println("Se finaliza");
 				conn.FinalizaTicket(Integer.parseInt(id_ticket), comentario, Integer.parseInt(usuario));
 				conn.cerrarConexion();
 				response.sendRedirect("AtencionTicket.jsp");
-			}else if("Traslado".equals(accion)) {
+			} else if ("Traslado".equals(accion)) {
 				System.out.println("Se traslada Ticket");
-			}else {
+				response.sendRedirect("AtencionTicket.jsp");
+			} else {
 				System.out.println("No se ha recibido ninguna accion");
 			}
 
-			System.out.println("Numero del ticket a procesar" + bt_llamar);
-			System.out.println("Numero del ticket a devolver" + bt_devolver);
-			
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		}
+	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}

@@ -71,6 +71,7 @@
     border-bottom: 1px solid #ccc;
     padding: 10px 0;
   }
+  
 </style>
 </head>
 <body>

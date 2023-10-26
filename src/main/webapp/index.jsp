@@ -9,7 +9,6 @@
 </head>
 	<link rel="stylesheet" type="text/css" href="ruta/estilo.css">
 <body>
-<h1>${error}</h1>
 <div class="login">
 	<h1>Login</h1>
     <form method="post" action="Login">
@@ -17,6 +16,7 @@
   <input type="password" class="login-password" name="user" required="true" placeholder="Password" />
         <button type="submit" class="btn btn-primary btn-block btn-large">Let me in.</button>
     </form>
+    <p>Estado: ${error}</p>
 </div>
 <div>
 

@@ -76,12 +76,14 @@ public class Connmysql {
 	// Registra empleado
 
 	public void RegistraEmpleado(ArrayList<String> Datos) throws SQLException {
-		CallableStatement cs = conexion.prepareCall(" { call RegistraEmpleado ( ?, ?, ?, ?, ? ) }");
+		CallableStatement cs = conexion.prepareCall(" { call RegistraEmpleado ( ?, ?, ?, ?, ?, ?, ? ) }");
 		cs.setInt(1, Integer.parseInt(Datos.get(0)));
 		cs.setString(2, Datos.get(1));
 		cs.setString(3, Datos.get(2));
 		cs.setInt(4, Integer.parseInt(Datos.get(3)));
 		cs.setInt(5, Integer.parseInt(Datos.get(4)));
+		cs.setString(6, Datos.get(5));
+		cs.setString(7, Datos.get(6));
 		cs.execute();
 		System.out.println("Empleado Registrado");
 	}
@@ -146,16 +148,27 @@ public class Connmysql {
 		return st.executeQuery(consulta);
 	}
 
-	// mostrar solo tickets asiognados a un area
-	public ResultSet ticket_Area(int identificacion) throws SQLException {
-		String consulta = "select \r\n" + "t.id_ticket,\r\n" + "a.nombre, a.id_area, \r\n"
-				+ "e.dpi_empleado, e.nombre as empleado, e.apellido,\r\n" + "et.nombre as estado\r\n" + "from \r\n"
-				+ "ticket t join area a \r\n" + "on t.id_area = a.id_area\r\n"
-				+ "left join empleado e on a.id_area = e.id_area join estado_ticket et	\r\n"
-				+ "on et.id_estado_ticket = t.estado_ticket\r\n" + "where t.estado_ticket in( 1, 2, 3) and exists (\r\n"
-				+ "select 1 from \r\n" + "empleado e where e.id_area = a.id_area and e.dpi_empleado = ?\r\n" + ");";
+	// recuperar area de emplead
+	public ResultSet Area(int area) throws SQLException {
+		String consulta = "SELECT a.id_area  from area a\r\n"
+				+ "join empleado e on e.id_area = a.id_area\r\n"
+				+ "where e.dpi_empleado = ? ;";
 		PreparedStatement ps = conexion.prepareStatement(consulta);
-		ps.setInt(1, identificacion);
+		ps.setInt(1, area);
+		return ps.executeQuery();
+	}
+	
+	//Ticker por area
+	public ResultSet TicketArea (int Area) throws SQLException {
+		String consulta = "SELECT \r\n"
+				+ "t.id_ticket ,\r\n"
+				+ "et.nombre as estado\r\n"
+				+ "from ticket t \r\n"
+				+ "join estado_ticket et ON t.estado_ticket  = et.id_estado_ticket \r\n"
+				+ "where id_area = ? and \r\n"
+				+ "estado_ticket in (1, 2, 3) ;";
+		PreparedStatement ps = conexion.prepareStatement(consulta);
+		ps.setInt(1,Area );
 		return ps.executeQuery();
 	}
 
@@ -179,19 +192,27 @@ public class Connmysql {
 	}
 
 	// Al hacer el login comprueba que exista el usuario
-	public boolean Comprueba(int dpi, String correo) throws SQLException {
-		String consulta1 = "select 1 from empleado where correo = ? and dpi_empleado = ?;";
+	public ResultSet Acceso(String identificacion) throws SQLException {
+		String consulta1 = "SELECT pagina, contenido from empleado e \r\n"
+				+ "join rol r ON e.id_rol = r.id_rol \r\n"
+				+ "join accesos a on a.id_rol = e.id_rol \r\n"
+				+ "where e.dpi_empleado = ? ;";
 		PreparedStatement ps = conexion.prepareStatement(consulta1);
-		ps.setString(1, correo);
-		ps.setInt(2, dpi);
-		ResultSet rs = ps.executeQuery();
-
-		if (rs.next()) {
-			return true;
-		} else {
-			return false;
-		}
+		ps.setInt(1, Integer.parseInt(identificacion));
+		return  ps.executeQuery();
 	}
+	
+	//Recuperar ID
+	public ResultSet Identificacion (String correo, String pass) throws SQLException{
+		String consulta = "SELECT dpi_empleado  from empleado e \r\n"
+				+ "where e.correo = ? and PASSWORD= ? ;";
+		PreparedStatement ps = conexion.prepareStatement(consulta);
+		ps.setString(1, correo);
+		ps.setString(2, pass);
+		return  ps.executeQuery();
+	}
+	
+	
 //Cambia el estado de ticker a llamada
 	public void llama_ticket(int ticket) throws SQLException {
 		CallableStatement sc = conexion.prepareCall(" { call llamar_ticket (?) }");

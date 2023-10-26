@@ -2,6 +2,7 @@ package com.empleado;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.mysql.Connmysql;
@@ -58,17 +59,24 @@ public class RegistraEmpleado extends HttpServlet {
 			datos.add(request.getParameter("apellido").toUpperCase());
 			datos.add(request.getParameter("id_area"));
 			datos.add(request.getParameter("id_rol"));
+			datos.add(request.getParameter("correo"));
+			datos.add(request.getParameter("pass"));
 			try {
 				Connmysql conn = new Connmysql();
 				conn.RegistraEmpleado(datos);
 				conn.cerrarConexion();
 				request.setAttribute("mensaje", "Nuevo empleado registrado");
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (SQLException e) {
+				if(e.getSQLState().equals("45000")) {
+					request.setAttribute("mensaje", "El empleado ya existe en la base de datos");
+				} else {
+					e.printStackTrace();
+					request.setAttribute("mensaje", "Error en el Servidor");
+
+				}
 			}	
 		}
-		request.getRequestDispatcher("usuario.jsp").forward(request, response);
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		request.getRequestDispatcher("RegistraEmpleado.jsp").forward(request, response);
 	}
 
 	/**
