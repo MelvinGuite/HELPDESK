@@ -148,7 +148,7 @@ public class Connmysql {
 		return st.executeQuery(consulta);
 	}
 
-	// recuperar area de emplead
+	// recuperar area de empleado
 	public ResultSet Area(int area) throws SQLException {
 		String consulta = "SELECT a.id_area  from area a\r\n"
 				+ "join empleado e on e.id_area = a.id_area\r\n"
@@ -273,4 +273,25 @@ public class Connmysql {
 		return ps.executeQuery();
 	}
 
+	public void Traslado (String ticket, String usuario, String area_destino, String comentario) throws SQLException {
+		CallableStatement cl = conexion.prepareCall("{ call CreaSeguimiento (?, ?, ?, ?) } ");
+		cl.setInt(1, Integer.parseInt(ticket));
+		cl.setInt(2, Integer.parseInt(usuario));
+		cl.setInt(3, Integer.parseInt(area_destino));
+		cl.setString(4, comentario);
+		cl.execute();
+	}
+	
+	public ResultSet TicketSeguimiento (String area) throws SQLException {
+		String consulta = "SELECT s.id_ticket ,s.dpi_empleado as usuario_traslada, s.comentario_atendido as comentario_traslado,\r\n"
+				+ "			a.nombre as area_traslada, \r\n"
+				+ "			et.nombre as estado\r\n"
+				+ "			from seguimiento s\r\n"
+				+ "			 join area a on a.id_area = s.id_area\r\n"
+				+ "			 join estado_ticket et on et.id_estado_ticket = s.id_estado_ticket \r\n"
+				+ "		  where area_destino = ? and s.id_estado_ticket in (5,6);";
+		PreparedStatement ps = conexion.prepareStatement(consulta);
+		ps.setInt(1, Integer.parseInt(area));
+		return ps.executeQuery();
+	}
 }

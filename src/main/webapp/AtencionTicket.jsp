@@ -76,7 +76,7 @@ if (usuario == null) {
 
 
 
-  <h1>Toma de Ticket</h1>
+  <h1>Toma de Ticket en espera</h1>
     <table id="ticket" >
         <thead>
             <tr>
@@ -90,6 +90,76 @@ if (usuario == null) {
             <!-- Aquí se insertarán las filas de datos -->
         </tbody>
     </table>
+
+
+<h1>Ticket Trasladados</h1>
+<table id="ticket_seguimiento">
+    <thead>
+        <tr>
+            <th>No. De Ticket</th>
+            <th>Empleado que traslada</th>
+            <th>Motivo</th>
+            <th>Area que traslada</th>
+            <th>Estado</th>
+            <th>Detalle</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var identificacion = "<%=usuario%>";
+
+       
+        setInterval(function () {
+            Tickets();
+        }, 1000);
+
+        function Tickets() {
+            $.ajax({
+                url: 'Ticket_Seguimiento',
+                type: 'get',
+                dataType: 'json',
+                data: { identificacion: identificacion },
+                success: function (data) {
+                    var tabla = $('#ticket_seguimiento').find('tbody');
+                    tabla.empty();
+
+                    for (var i = 0; i < data.length; i += 5) {
+                        var id_ticket = data[i];
+                        var usuario = data[i + 1];
+                        var comentario = data[i + 2];
+                        var area = data[i + 3];
+                        var estado = data[i + 4];
+
+                        var row = $('<tr>');
+                        row.append($('<td>').text(id_ticket));
+                        row.append($('<td>').text(usuario));
+                        row.append($('<td>').text(comentario));
+                        row.append($('<td>').text(area));
+                        row.append($('<td>').text(estado));
+                        row.append($('<td>').html('<a href="DetalleTicket.jsp?id=' + id_ticket + '">Ver Detalles</a>'));
+
+                        tabla.append(row); // Agrega la fila a la tabla
+                    }
+                },
+                error: function () {
+                    console.log('Error en la solicitud');
+                }
+            });
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+
 
 
 
@@ -130,10 +200,7 @@ $(document).ready(function () {
                     var llamarButton = $('<button>').text('Llamar');
                     var devolverButton = $('<button>').text('Devolver');
 
-                    if (llamadaActual || estado === 'Llamada') {
-                        // Deshabilita el botón de "Llamar" si ya hay una llamada en curso
-                        llamarButton.prop('disabled', true);
-                    }
+                    
 
                     llamarButton.click(function (id, accion) {
                         return function () {

@@ -120,13 +120,16 @@ String identificador = request.getParameter("id");
 
 
 	<form action="Estados" method="get">
-		<label>Indique area a trasladar ticket</label> <select name="area">
+		<label>Indique area a trasladar ticket</label> 
+		<select name="area" id="area">
 			<option value="1">Contabilidad</option>
 			<option value="2">Cobros</option>
 			<option value="3">Prestaciones</option>
 		</select> 
 		<label>Motivo de traslado</label>
-		<textarea rows="5" cols="15" name="motivo_traslado"></textarea>
+		<textarea rows="5" cols="15" name="motivo_traslado" id="motivo_traslado"></textarea>
+		<input name="ticket" id="ticket" value="<%=identificador%>" hidden="true">
+		<input name="usuario" id="usuario" value="<%=usuario%>" hidden="true"> 
 		<br>
 
 		<button name="acciones" id="acciones" value="Traslado">Trasladar</button>

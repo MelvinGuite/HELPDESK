@@ -61,7 +61,13 @@ public class Estados extends HttpServlet {
 				conn.cerrarConexion();
 				response.sendRedirect("AtencionTicket.jsp");
 			} else if ("Traslado".equals(accion)) {
+				String area_traslado = request.getParameter("area");
+				String motivo_traslado = request.getParameter("motivo_traslado");
 				System.out.println("Se traslada Ticket");
+				System.out.println("Se traslada ticket:" + id_ticket);
+				System.out.println("Usuario que hace el traslado: " + usuario + " al area: " + area_traslado + " Por motivo: " + motivo_traslado);
+				conn.Traslado(id_ticket, usuario, area_traslado, motivo_traslado);
+				conn.cerrarConexion();
 				response.sendRedirect("AtencionTicket.jsp");
 			} else {
 				System.out.println("No se ha recibido ninguna accion");
