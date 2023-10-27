@@ -20,12 +20,13 @@
     }
 
     /* Estilos para el men� lateral */
-    .sidebar {
-      width: 250px;
-      background-color: #333;
-      color: #fff;
-      padding: 20px;
-    }
+.sidebar {
+  width: 250px;
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+  position: relative; /* Añade posición relativa al contenedor padre */
+}
 
     .sidebar h2 {
       margin-top: 0;
@@ -79,7 +80,18 @@
         flex: 1;
       }
     }
+    
+    .logo {
+  position: absolute;
+  top: 0px; /* Ajusta la posición vertical según tu preferencia */
+  left: 150px; /* Ajusta la posición horizontal según tu preferencia */
+}
+
+.logo img {
+  width: 130px; /* Ajusta el ancho del logo según tu diseño */
+}
   </style>
+  
 </head>
     <%
 String usuario = (String) request.getSession().getAttribute("sesion");
@@ -89,8 +101,11 @@ if (usuario == null) {
 }
 %>
 <body>
+
 <div class="container">
   <div class="sidebar" id="sidebar">
+      <div class="logo"><img alt="" src="Logo.png"></div>
+      
     <h2>Menu</h2>
     <p>En linea: <%=usuario%></p>
     <ul></ul> <!-- Aquí se agregarán los enlaces dinámicamente -->
