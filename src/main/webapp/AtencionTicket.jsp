@@ -139,7 +139,7 @@ if (usuario == null) {
                         row.append($('<td>').text(comentario));
                         row.append($('<td>').text(area));
                         row.append($('<td>').text(estado));
-                        row.append($('<td>').html('<a href="DetalleTicket.jsp?id=' + id_ticket + '">Ver Detalles</a>'));
+                        row.append($('<td>').html('<a href="DetalleSeguimiento.jsp?id=' + id_ticket + '">Ver Detalles</a>'));
 
                         tabla.append(row); // Agrega la fila a la tabla
                     }
