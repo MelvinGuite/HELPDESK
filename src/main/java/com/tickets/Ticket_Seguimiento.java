@@ -48,7 +48,7 @@ public class Ticket_Seguimiento extends HttpServlet {
 				response.setCharacterEncoding("UTF-8");
 				
 				response.getWriter().write(json);
-				System.out.println(json);
+				//System.out.println(json);
 			}
 			
 			

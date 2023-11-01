@@ -10,7 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class Connmysql {
-	private String url = "jdbc:mysql://database-1.clrghkrtdl1q.us-east-2.rds.amazonaws.com:3306/prueba";
+	private String url = "jdbc:mysql://127.0.0.1:3306/prueba";
 	private String usuario = "admin";
 	private String password = "1829372MG";
 	private Connection conexion = null;
@@ -273,6 +273,7 @@ public class Connmysql {
 		return ps.executeQuery();
 	}
 
+	//Crea registro de seguimiento de ticket
 	public void Traslado (String ticket, String usuario, String area_destino, String comentario) throws SQLException {
 		CallableStatement cl = conexion.prepareCall("{ call CreaSeguimiento (?, ?, ?, ?) } ");
 		cl.setInt(1, Integer.parseInt(ticket));
@@ -282,6 +283,7 @@ public class Connmysql {
 		cl.execute();
 	}
 	
+	//Muestra los ticket que han sido trasladados
 	public ResultSet TicketSeguimiento (String area) throws SQLException {
 		String consulta = "SELECT s.id_ticket ,s.dpi_empleado as usuario_traslada, s.comentario_atendido as comentario_traslado,\r\n"
 				+ "			a.nombre as area_traslada, \r\n"
@@ -294,4 +296,56 @@ public class Connmysql {
 		ps.setInt(1, Integer.parseInt(area));
 		return ps.executeQuery();
 	}
+	
+	//Actualiza el ticket de seguimiento
+	public void AtiendeSeguimiento (String usuario, String ticket, String comentario) throws SQLException {
+		CallableStatement cl = conexion.prepareCall(" { call Atendiendo_Traslado (?, ?, ? ) } ");
+		cl.setInt(1, Integer.parseInt(usuario));
+		cl.setInt(2, Integer.parseInt(ticket));
+		cl.setString(3, comentario);
+		cl.execute();
+	}
+	
+	//Finaliza el ticket que fue trasladado
+	public void FinalizaSeguimiento (String ticket, String usuario, String comentario) throws SQLException {
+		CallableStatement cl = conexion.prepareCall(" { call Finaliza_Seguimiento (?, ?, ?) }");
+		cl.setInt(1, Integer.parseInt(ticket));
+		cl.setInt(2, Integer.parseInt(usuario));
+		cl.setString(3, comentario);
+		cl.execute();
+	}
+	
+	public ResultSet HistorialTicket (String usuario) throws SQLException {
+		String consulta = "select id_ticket , fecha_cierre , comentario_empleado \r\n"
+				+ "from ticket where dpi_empleado = ? and estado_ticket = 4; " ;
+		PreparedStatement ps = conexion.prepareStatement(consulta);
+		ps.setInt(1, Integer.parseInt(usuario));
+		return ps.executeQuery();
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

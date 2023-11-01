@@ -76,21 +76,26 @@ String identificador = request.getParameter("id");
 
 
 <a href="AtencionTicket.jsp">Regresar</a>
-	<form action="" method="get">
+	<form action="Estados" method="get">
 		<label>Indique la finalizacion del Ticket</label> 
-		<textarea rows="5" cols="15" name="motivo_traslado" id="motivo_traslado"></textarea>
+		<textarea rows="5" cols="15" name="Comentario_Finaliza" id="Comentario_Finaliza"></textarea>
 		<input name="ticket" id="ticket" value="<%=identificador%>" hidden="true">
 		<input name="usuario" id="usuario" value="<%=usuario%>" hidden="true"> 
 		<br>
-
-		<button name="acciones" id="acciones" value="Traslado">Guardar</button>
+		<button name="acciones" id="acciones" value="Finalizar_Traslado">Guardar</button>
 	</form>
-<h2>¿El ticket esta en espera?</h2>
+	
+	
+<h2>¿El ticket se esta siendo atendido?</h2>
 <label>Cambia el estado a "Atendiendo"</label> 
-	<form action="" method="get">
+	<form action="Estados" method="get">
 		<input name="ticket" id="ticket" value="<%=identificador%>" hidden="true">
 		<input name="usuario" id="usuario" value="<%=usuario%>" hidden="true"> 
-		<button name="acciones" id="acciones" value="Traslado">Cambiar estado</button>
+	    <textarea rows="5" cols="15" name="atendiendo" id="atendiendo"></textarea>
+		<button name="acciones" id="acciones" value="Atender_Traslado">Atendiendo</button>
 	</form>
 </body>
 </html>
+
+
+
